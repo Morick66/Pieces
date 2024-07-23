@@ -1,0 +1,15 @@
+@import url('initialization.css');
+@import url('form-input.css');
+@import url('content.css');
+@import url('nav.css');
+@import url('bootstrap.min.css');
+
+main {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.modal-content .form-control {
+    resize: none;
+    height: 150px;
+}

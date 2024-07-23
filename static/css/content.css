@@ -1,0 +1,37 @@
+.pieces-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 10px
+}
+
+.pieces-list .pieces-item {
+    background-color: rgb(204, 204, 216);
+    padding: 10px;
+    border-radius: 10px;
+    position: relative;
+}
+
+.pieces-item-timestamp {
+    margin-top: 5px;
+    font-size: 15px;
+}
+
+.pieces-item-image img {
+    width: 100%;
+}
+
+.pieces-item-buttons {
+    display: flex;
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
+}
+
+.pieces-item-buttons button {
+    background-color: transparent;
+    padding: 1px 5px;
+    width: auto;
+    height: auto;
+    border: 0;
+}
