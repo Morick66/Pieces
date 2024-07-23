@@ -5,6 +5,7 @@ import os
 from datetime import datetime
 import uuid
 from werkzeug.utils import secure_filename
+from flask_cors import CORS
 
 app = Flask(__name__)
 IDEAS_FILE = '/data/data.json'
@@ -15,6 +16,7 @@ USERNAME = os.getenv('USERNAME', 'admain')
 PASSWORD = os.getenv('PASSWORD', 'pieces')
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+CORS(app, resources={r"/data.json": {"origins": ["https://www.morick66.com"]}})
 
 # 确保上传文件夹存在
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
@@ -23,7 +25,7 @@ def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 def check_auth(username, password):
-    return username == "USERNAME" and password == "PASSWORD"
+    return username == USERNAME and password == PASSWORD
 
 def authenticate():
     return Response(
@@ -125,6 +127,7 @@ def get_ideas_json():
             ideas = json.load(file)
         return jsonify(ideas)
     return jsonify([])
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=False)
