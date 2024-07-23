@@ -5,7 +5,6 @@ import os
 from datetime import datetime
 import uuid
 from werkzeug.utils import secure_filename
-from flask_cors import CORS
 
 app = Flask(__name__)
 IDEAS_FILE = '/data/data.json'
@@ -16,7 +15,6 @@ USERNAME = os.getenv('USERNAME', 'admain')
 PASSWORD = os.getenv('PASSWORD', 'pieces')
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-CORS(app, resources={r"/data.json": {"origins": ["https://www.morick66.com"]}})
 
 # 确保上传文件夹存在
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
