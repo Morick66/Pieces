@@ -12,11 +12,14 @@
             <div class="title">Pieces</div>
         </nav>
         <div class="form-input">
-            <form action="{{ url_for('add_idea') }}" method="POST" enctype="multipart/form-data" onsubmit="setLocalTimestamp();">
-                <textarea name="idea" id=""></textarea>
+            <form action="{{ url_for('add_idea') }}" method="POST" enctype="multipart/form-data" onsubmit="setLocalTimestamp();handleSubmit(event);">
+                <textarea name="idea" id="" oninput="autoResize(this)" placeholder="想分享点什么?"></textarea>
+                <br>
+                <div id="preview"></div>
                 <input type="hidden" name="local_timestamp" id="localTimestamp">
                 <div class="footer-form">
-                    <input type="file" name="file" accept="image/*">
+                    <input type="file" id="fileInput" name="files" accept="image/*" multiple onchange="handleFiles(this.files)" style="display: none;">
+                    <button type="button" onclick="document.getElementById('fileInput').click();">选择图片</button>
                     <div class="button-box">
                         <button type="submit">
                             <svg t="1721134812269" class="icon" fill="#333333" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="6354" width="200" height="200"><path d="M512 0.001287c-282.769282 0-511.998713 229.229431-511.998713 511.998713 0 282.769282 229.229431 511.998713 511.998713 511.998713 282.767995 0 511.998713-229.228144 511.998713-511.998713C1023.998713 229.230718 794.767995 0.001287 512 0.001287zM748.560448 544.492778 542.994656 544.492778l0 205.560645c0 17.279887-13.946437 31.226324-31.221176 31.226324-17.279887 0-31.226324-13.946437-31.226324-31.226324L480.547156 544.492778l-205.559357 0c-17.279887 0-31.226324-13.946437-31.226324-31.226324s13.946437-31.226324 31.226324-31.226324l205.666182 0 0-205.559357c0-17.279887 13.94515-31.226324 31.219889-31.226324 17.279887 0 31.226324 13.946437 31.226324 31.226324L543.100194 482.041417l205.560645 0c17.17435 0 31.120786 13.946437 31.120786 31.226324S765.835188 544.492778 748.560448 544.492778z" p-id="6355"></path></svg>
@@ -29,10 +32,14 @@
             {% for idea in ideas %}
             <div class="pieces-item">
                 <div class="pieces-item-content">
+                    {% if idea.idea %}  <!-- 检查文本是否存在并非空 -->
                     {{ idea.idea }}
-                    {% if idea.image %}
+                    {% endif %}
+                    {% if idea.images %} <!-- 注意这里改为 images, 假设存的是多张图片的列表 -->
                     <div class="pieces-item-image">
-                        <img src="{{ url_for('uploaded_file', filename=idea.image) }}" alt="Image">
+                        {% for img in idea.images %}
+                        <img src="{{ url_for('uploaded_file', filename=img) }}" alt="Image">
+                        {% endfor %}
                     </div>
                     {% endif %}
                 </div>
@@ -63,7 +70,17 @@
                             <div class="modal-body">
                                 <textarea class="form-control" name="idea">{{ idea.idea }}</textarea>
                                 <br>
-                                <input type="file" name="file" accept="image/*">
+                                <div>
+                                    <!-- 显示当前图片 -->
+                                    {% for img in idea.images %}
+                                    <div class="img-preview-container">
+                                        <img src="{{ url_for('uploaded_file', filename=img) }}" alt="Image" style="width: 100px; height: auto;">
+                                        <button type="button" onclick="removeExistingImage('{{ img }}', '{{ idea.id }}', this)">删除</button>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                <!-- 上传新图片 -->
+                                <input type="file" name="new_files" accept="image/*" multiple>
                             </div>
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
@@ -73,6 +90,7 @@
                     </div>
                 </div>
             </div>
+            
             {% endfor %}
         </div>
     </main>
@@ -129,5 +147,93 @@
             }
         }
     </script>
+    <script>
+        let allFiles = []; // 存储所有文件的数组
+        
+        function handleFiles(files) {
+            Array.from(files).forEach((file, index) => {
+                if (!allFiles.some(f => f.name === file.name && f.size === file.size && f.lastModified === file.lastModified)) {
+                    allFiles.push(file);
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        const imgContainer = document.createElement('div');
+                        imgContainer.className = 'img-preview-container';
+                        const img = document.createElement('img');
+                        const deleteBtn = document.createElement('button');
+
+                        img.src = e.target.result;
+                        img.style.width = 'auto';
+                        img.style.height = '50px';
+                        
+                        deleteBtn.textContent = '×';
+                        deleteBtn.onclick = function() { removeImage(file, imgContainer); };
+
+                        imgContainer.appendChild(img);
+                        imgContainer.appendChild(deleteBtn);
+                        document.getElementById('preview').appendChild(imgContainer);
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+        function removeImage(file, imgContainer) {
+            // 查找要删除的文件在数组中的索引
+            const index = allFiles.indexOf(file);
+            if (index > -1) {
+                allFiles.splice(index, 1); // 从数组中移除文件
+            }
+            imgContainer.remove(); // 移除图片和按钮的容器
+        }
+
+        function handleSubmit(event) {
+            event.preventDefault(); // 阻止表单的默认提交行为
+            const form = document.querySelector('form');
+            const formData = new FormData(form);
+            formData.delete('files');
+            allFiles.forEach(file => {
+                formData.append('files', file); // 确保所有文件都被添加
+            });
+
+            fetch(form.action, {
+                method: 'POST',
+                body: formData
+            }).then(response => {
+                if (response.ok) {
+                    alert('提交成功');
+                    allFiles = []; // 清空文件数组以避免重复提交
+                    document.getElementById('preview').innerHTML = ''; // 清空预览
+                    window.location.reload();
+                } else {
+                    alert('提交失败');
+                }
+            }).catch(error => {
+                console.error('Error:', error);
+                alert("提交失败");
+            });
+        }
+        function removeExistingImage(filename, ideaId, element) {
+            fetch(`/delete-image/${ideaId}/${filename}`, { method: 'POST' })
+            .then(response => {
+                if (response.ok) {
+                    // 从DOM中移除图片容器
+                    element.parentNode.remove();
+                } else {
+                    alert('图片删除失败');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert("删除错误");
+            });
+        }
+
+    </script>
+    <script>
+        function autoResize(textarea) {
+          // 清除旧的样式
+          textarea.style.height = 'auto';
+          textarea.style.height = textarea.scrollHeight + 'px';
+        }
+    </script>  
 </body>
 </html>

@@ -23,7 +23,7 @@ def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 def check_auth(username, password):
-    return username == USERNAME and password == PASSWORD
+    return username == "111" and password == "111"
 
 def authenticate():
     return Response(
@@ -66,32 +66,56 @@ def index():
 @requires_auth
 def add_idea():
     new_idea = request.form.get('idea')
-    local_timestamp = request.form.get('local_timestamp')
-    file = request.files.get('file')
-    if new_idea:
-        ideas = load_ideas()
-        timestamp = local_timestamp
-        idea_id = str(uuid.uuid4())
-        filename = None
+    files = request.files.getlist('files')  # 获取多个文件
+    print("Received idea:", new_idea)
+    ideas = load_ideas()
+    idea_id = str(uuid.uuid4())
+    filenames = []
+
+    for file in files:
         if file and allowed_file(file.filename):
             filename = get_timestamped_filename(file.filename)
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-        ideas.insert(0, {'id': idea_id, 'idea': new_idea, 'timestamp': timestamp, 'image': filename})
-        save_ideas(ideas)
+            filenames.append(filename)
+
+    ideas.insert(0, {'id': idea_id, 'idea': new_idea, 'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 'images': filenames})
+    save_ideas(ideas)
     return redirect(url_for('index'))
 
 @app.route('/delete/<idea_id>', methods=['POST'])
 @requires_auth
 def delete_idea(idea_id):
     ideas = load_ideas()
-    for idea in ideas:
-        if idea['id'] == idea_id:
-            if idea.get('image'):
-                os.remove(os.path.join(app.config['UPLOAD_FOLDER'], idea['image']))
-            ideas.remove(idea)
-            break
-    save_ideas(ideas)
+    updated_ideas = [idea for idea in ideas if idea['id'] != idea_id]
+    # 获取需要删除的想法
+    idea_to_delete = next((idea for idea in ideas if idea['id'] == idea_id), None)
+    if idea_to_delete:
+        # 删除关联的图片文件
+        if 'images' in idea_to_delete:
+            for img in idea_to_delete['images']:
+                try:
+                    os.remove(os.path.join(app.config['UPLOAD_FOLDER'], img))
+                except OSError as e:
+                    print(f"Error deleting image {img}: {e}")
+    # 保存更新后的想法列表
+    save_ideas(updated_ideas)
     return '', 204
+
+@app.route('/delete-image/<idea_id>/<filename>', methods=['POST'])
+@requires_auth
+def delete_image(idea_id, filename):
+    ideas = load_ideas()
+    idea = next((item for item in ideas if item['id'] == idea_id), None)
+    if idea and filename in idea['images']:
+        try:
+            os.remove(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            idea['images'].remove(filename)
+            save_ideas(ideas)
+            return '', 204
+        except OSError as e:
+            print(f"Error deleting image {filename}: {e}")
+            return 'Error deleting image', 500
+    return 'Image not found', 404
 
 @app.route('/edit/<idea_id>', methods=['GET', 'POST'])
 @requires_auth
@@ -128,4 +152,4 @@ def get_ideas_json():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=False)
+    app.run(host='0.0.0.0', port=10055, debug=False)
