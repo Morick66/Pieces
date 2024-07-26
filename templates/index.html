@@ -12,11 +12,14 @@
             <div class="title">Pieces</div>
         </nav>
         <div class="form-input">
-            <form action="{{ url_for('add_idea') }}" method="POST" enctype="multipart/form-data" onsubmit="setLocalTimestamp();">
-                <textarea name="idea" id=""></textarea>
+            <form action="{{ url_for('add_idea') }}" method="POST" enctype="multipart/form-data" onsubmit="setLocalTimestamp();handleSubmit(event);">
+                <textarea name="idea" id="" oninput="autoResize(this)" placeholder="想分享点什么?"></textarea>
+                <br>
+                <div id="preview" class="preview"></div>
                 <input type="hidden" name="local_timestamp" id="localTimestamp">
                 <div class="footer-form">
-                    <input type="file" name="file" accept="image/*">
+                    <input type="file" id="fileInput" name="files" accept="image/*" multiple onchange="handleFiles(this.files)" style="display: none;">
+                    <button type="button" onclick="document.getElementById('fileInput').click();">选择图片</button>
                     <div class="button-box">
                         <button type="submit">
                             <svg t="1721134812269" class="icon" fill="#333333" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="6354" width="200" height="200"><path d="M512 0.001287c-282.769282 0-511.998713 229.229431-511.998713 511.998713 0 282.769282 229.229431 511.998713 511.998713 511.998713 282.767995 0 511.998713-229.228144 511.998713-511.998713C1023.998713 229.230718 794.767995 0.001287 512 0.001287zM748.560448 544.492778 542.994656 544.492778l0 205.560645c0 17.279887-13.946437 31.226324-31.221176 31.226324-17.279887 0-31.226324-13.946437-31.226324-31.226324L480.547156 544.492778l-205.559357 0c-17.279887 0-31.226324-13.946437-31.226324-31.226324s13.946437-31.226324 31.226324-31.226324l205.666182 0 0-205.559357c0-17.279887 13.94515-31.226324 31.219889-31.226324 17.279887 0 31.226324 13.946437 31.226324 31.226324L543.100194 482.041417l205.560645 0c17.17435 0 31.120786 13.946437 31.120786 31.226324S765.835188 544.492778 748.560448 544.492778z" p-id="6355"></path></svg>
@@ -29,10 +32,14 @@
             {% for idea in ideas %}
             <div class="pieces-item">
                 <div class="pieces-item-content">
+                    {% if idea.idea %}  <!-- 检查文本是否存在并非空 -->
                     {{ idea.idea }}
-                    {% if idea.image %}
+                    {% endif %}
+                    {% if idea.images %} <!-- 注意这里改为 images, 假设存的是多张图片的列表 -->
                     <div class="pieces-item-image">
-                        <img src="{{ url_for('uploaded_file', filename=idea.image) }}" alt="Image">
+                        {% for img in idea.images %}
+                        <img src="{{ url_for('uploaded_file', filename=img) }}" alt="Image">
+                        {% endfor %}
                     </div>
                     {% endif %}
                 </div>
@@ -50,84 +57,14 @@
                     </button>
                 </div>
             </div>
-            <div class="modal fade" id="editModal{{ idea.id }}" tabindex="-1" role="dialog" aria-labelledby="editModalLabel{{ idea.id }}" aria-hidden="true">
-                <div class="modal-dialog" role="document">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="editModalLabel{{ idea.id }}">编辑想法</h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        <form action="{{ url_for('edit_idea', idea_id=idea.id) }}" method="POST" enctype="multipart/form-data">
-                            <div class="modal-body">
-                                <textarea class="form-control" name="idea">{{ idea.idea }}</textarea>
-                                <br>
-                                <input type="file" name="file" accept="image/*">
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
-                                <button type="submit" class="btn btn-primary">保存修改</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
+            {% include 'modal.html' %}
             {% endfor %}
         </div>
     </main>
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script>
-        function setLocalTimestamp() {
-            // 获取当前日期和时间
-            var now = new Date();
-    
-            // 获取年、月、日
-            var year = now.getFullYear();
-            var month = (now.getMonth() + 1).toString().padStart(2, '0'); // 月份是从0开始的
-            var day = now.getDate().toString().padStart(2, '0');
-    
-            // 获取小时、分钟
-            var hours = now.getHours().toString().padStart(2, '0'); // 24小时制
-            var minutes = now.getMinutes().toString().padStart(2, '0');
-    
-            // 组合成需要的格式
-            var formattedTimestamp = `${year}-${month}-${day} ${hours}:${minutes}`;
-    
-            // 设置隐藏input的值为格式化后的时间
-            document.getElementById('localTimestamp').value = formattedTimestamp;
-        }
-    
-        // 当文档加载完毕时，绑定事件
-        document.addEventListener('DOMContentLoaded', function() {
-            var form = document.querySelector('form');
-            form.addEventListener('submit', setLocalTimestamp);
-        });
-    </script>
-    <script>
-        function deleteIdea(ideaId) {
-            if (confirm("确认删除这个想法吗？")) {
-                fetch(`/delete/${ideaId}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    }
-                })
-                .then(response => {
-                    if (response.ok) {
-                        location.reload();
-                    } else {
-                        alert("删除失败");
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    alert("删除失败");
-                });
-            }
-        }
-    </script>
+    <script src="/static/js/timestampHandling.js"></script>
+    <script src="/static/js/formHandling.js"></script>
+    <script src="/static/js/ideaDeletion.js"></script>
+    <script src="/static/js/modalHandling.js"></script>
+    <script src="/static/js/modalControl.js"></script>
 </body>
 </html>

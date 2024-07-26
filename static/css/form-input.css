@@ -1,18 +1,23 @@
 .form-input {
     box-sizing: border-box;
-    height: 200px;
+    height: auto;
     margin: 10px;
-    background-color: rgb(214, 221, 221);
+    background-color: #27272A;
     padding: 10px;
     border-radius: 10px;
+    border: 1px solid var(--card-border-color);
 }
 
 .form-input textarea {
     resize: none;
     box-sizing: border-box;
-    height: 150px;
+    height: auto;
     width: 100%;
     padding: 10px;
+    background-color: transparent;
+    border: none;
+    outline: none;
+    color: var(--text-main-color);
 }
 .icon {
     width: auto;
@@ -35,4 +40,28 @@
 .footer-form {
     display: flex;
     justify-content: space-between;
+}
+.preview {
+    display: flex;
+    gap: 8px;
+    margin: 10px 0px;
+    overflow-y: auto;
+}
+
+.img-preview-container {
+    position: relative;
+}
+
+.img-preview-container button {
+    display: flex;
+    box-sizing: border-box;
+    padding: 8px;
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    width: 10px;
+    height: 10px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 5px;
 }

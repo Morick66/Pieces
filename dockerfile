@@ -11,7 +11,7 @@ COPY . /app
 RUN pip install --no-cache-dir -r requirements.txt
 
 # 暴露端口
-EXPOSE 5000
+EXPOSE 10055
 
 # 运行应用程序
 CMD ["python", "pieces.py"]

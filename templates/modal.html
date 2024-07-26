@@ -1,0 +1,32 @@
+<div class="modal" id="editModal{{ idea.id }}" tabindex="-1" role="dialog" aria-labelledby="editModalLabel{{ idea.id }}" aria-hidden="true">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="editModalLabel{{ idea.id }}">编辑想法</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <form id="editForm-{{ idea.id }}" action="{{ url_for('edit_idea', idea_id=idea.id) }}" method="POST" enctype="multipart/form-data">
+            <div class="modal-body">
+                <textarea class="form-control" name="idea">{{ idea.idea }}</textarea>
+                <br>
+                <!-- 编辑模态框中的图片预览和上传部分 -->
+                <div id="previewModal-{{ idea.id }}" class="preview">
+                    <!-- 显示当前图片，并添加删除按钮 -->
+                    {% for img in idea.images %}
+                    <div class="img-preview-container" id="image-{{ idea.id }}-{{ loop.index }}">
+                        <img src="{{ url_for('uploaded_file', filename=img) }}" alt="Image" style="width: auto; height: 50px;">
+                        <button type="button" onclick="markImageForDeletion('{{ idea.id }}', '{{ img }}', 'image-{{ idea.id }}-{{ loop.index }}')">×</button>
+                    </div>
+                    {% endfor %}
+                </div>
+                <!-- 上传新图片 -->
+                <input type="file" name="new_files" accept="image/*" multiple onchange="handleModalFiles(this.files, '{{ idea.id }}')">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">关闭</button>
+                <button type="submit" onclick="handleSubmitEdit('{{ idea.id }}', event)">保存修改</button>
+            </div>
+        </form>
+    </div>
+</div>

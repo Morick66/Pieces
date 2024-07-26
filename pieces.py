@@ -67,52 +67,87 @@ def index():
 def add_idea():
     new_idea = request.form.get('idea')
     local_timestamp = request.form.get('local_timestamp')
-    file = request.files.get('file')
-    if new_idea:
-        ideas = load_ideas()
-        timestamp = local_timestamp
-        idea_id = str(uuid.uuid4())
-        filename = None
+    files = request.files.getlist('files')  # 获取多个文件
+    print("Received idea:", new_idea)
+    ideas = load_ideas()
+    idea_id = str(uuid.uuid4())
+    filenames = []
+
+    for file in files:
         if file and allowed_file(file.filename):
             filename = get_timestamped_filename(file.filename)
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-        ideas.insert(0, {'id': idea_id, 'idea': new_idea, 'timestamp': timestamp, 'image': filename})
-        save_ideas(ideas)
+            filenames.append(filename)
+
+    ideas.insert(0, {'id': idea_id, 'idea': new_idea, 'timestamp': local_timestamp, 'images': filenames})
+    save_ideas(ideas)
     return redirect(url_for('index'))
 
 @app.route('/delete/<idea_id>', methods=['POST'])
 @requires_auth
 def delete_idea(idea_id):
     ideas = load_ideas()
-    for idea in ideas:
-        if idea['id'] == idea_id:
-            if idea.get('image'):
-                os.remove(os.path.join(app.config['UPLOAD_FOLDER'], idea['image']))
-            ideas.remove(idea)
-            break
-    save_ideas(ideas)
+    updated_ideas = [idea for idea in ideas if idea['id'] != idea_id]
+    # 获取需要删除的想法
+    idea_to_delete = next((idea for idea in ideas if idea['id'] == idea_id), None)
+    if idea_to_delete:
+        # 删除关联的图片文件
+        if 'images' in idea_to_delete:
+            for img in idea_to_delete['images']:
+                try:
+                    os.remove(os.path.join(app.config['UPLOAD_FOLDER'], img))
+                except OSError as e:
+                    print(f"Error deleting image {img}: {e}")
+    # 保存更新后的想法列表
+    save_ideas(updated_ideas)
     return '', 204
 
-@app.route('/edit/<idea_id>', methods=['GET', 'POST'])
+@app.route('/delete-image/<idea_id>/<filename>', methods=['POST'])
+@requires_auth
+def delete_image(idea_id, filename):
+    ideas = load_ideas()
+    idea = next((item for item in ideas if item['id'] == idea_id), None)
+    if idea and filename in idea['images']:
+        idea['images'].remove(filename)  # 从想法中删除引用
+        file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        if os.path.exists(file_path):
+            os.remove(file_path)  # 删除文件
+            save_ideas(ideas)  # 保存更改
+            return '', 204
+    return 'Not Found', 404
+
+@app.route('/edit/<idea_id>', methods=['POST'])
 @requires_auth
 def edit_idea(idea_id):
     ideas = load_ideas()
     idea = next((idea for idea in ideas if idea['id'] == idea_id), None)
-    if request.method == 'POST':
-        new_idea = request.form.get('idea')
-        file = request.files.get('file')
-        if idea:
-            if new_idea:
-                idea['idea'] = new_idea
-            if file and allowed_file(file.filename):
-                if idea.get('image'):
-                    os.remove(os.path.join(app.config['UPLOAD_FOLDER'], idea['image']))
-                filename = get_timestamped_filename(file.filename)
-                file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-                idea['image'] = filename
-            save_ideas(ideas)
-            return redirect(url_for('index'))
-    return render_template('edit.html', idea=idea)
+    if not idea:
+        return 'Idea not found', 404
+
+    # 更新想法内容
+    new_idea_content = request.form.get('idea')
+    if new_idea_content:
+        idea['idea'] = new_idea_content
+
+    # 处理新文件上传
+    new_files = request.files.getlist('new_files')
+    for file in new_files:
+        if file and allowed_file(file.filename):
+            filename = get_timestamped_filename(file.filename)
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            idea['images'].append(filename)  # 添加新文件
+
+    # 处理待删除的文件
+    to_delete_files = request.form.getlist('to_delete_files')
+    for filename in to_delete_files:
+        if filename in idea['images']:
+            idea['images'].remove(filename)
+            file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            os.remove(file_path)
+
+    save_ideas(ideas)
+    return redirect(url_for('index'))
+
 
 @app.route('/uploads/<filename>')
 def uploaded_file(filename):
@@ -128,4 +163,4 @@ def get_ideas_json():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=False)
+    app.run(host='0.0.0.0', port=10055, debug=False)
