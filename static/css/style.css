@@ -9,6 +9,10 @@ main {
     margin: 0 auto;
 }
 
+.modal-content .form-control {
+    resize: none;
+    height: 150px;
+}
 body {
-    background-color: var(--body-background-color);
+    background-color: var(--body-background-color) !important;
 }
