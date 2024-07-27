@@ -15,7 +15,7 @@
             <form action="{{ url_for('add_idea') }}" method="POST" enctype="multipart/form-data" onsubmit="setLocalTimestamp();handleSubmit(event);">
                 <textarea name="idea" id="" oninput="autoResize(this)" placeholder="想分享点什么?"></textarea>
                 <br>
-                <div id="preview"></div>
+                <div id="preview" class="preview"></div>
                 <input type="hidden" name="local_timestamp" id="localTimestamp">
                 <div class="footer-form">
                     <input type="file" id="fileInput" name="files" accept="image/*" multiple onchange="handleFiles(this.files)" style="display: none;">

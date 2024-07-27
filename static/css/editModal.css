@@ -70,7 +70,7 @@
 .form-control {
     resize: none;
     box-sizing: border-box;
-    height: auto;
+    height: calc(auto+20px);
     width: 100%;
     padding: 10px;
     background-color: transparent;

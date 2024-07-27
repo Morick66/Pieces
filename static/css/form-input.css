@@ -41,7 +41,7 @@
     display: flex;
     justify-content: space-between;
 }
-#preview {
+.preview {
     display: flex;
     gap: 8px;
     margin-bottom: 10px;
@@ -51,12 +51,14 @@
 }
 .img-preview-container button {
     box-sizing: border-box;
-    padding: 8px;
+    display: flex;
+    padding: 0;
+    width: 15px;
+    height: 15px;
+    box-sizing: border-box;
     position: absolute;
     top: -5px;
     right: -5px;
-    width: 10px;
-    height: 10px;
-    text-align: center;
     justify-content: center;
+    align-items: center;
 }

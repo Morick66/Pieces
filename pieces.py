@@ -23,7 +23,9 @@ def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 def check_auth(username, password):
-    return username == USERNAME and password == PASSWORD
+    # return username == USERNAME and password == PASSWORD
+    return username == '111' and password == '111'
+
 
 def authenticate():
     return Response(
