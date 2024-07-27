@@ -66,10 +66,7 @@ def index():
 @requires_auth
 def add_idea():
     new_idea = request.form.get('idea')
-<<<<<<< HEAD
     local_timestamp = request.form.get('local_timestamp')
-=======
->>>>>>> d80969a7a5799dd4627d1610c714e380ca921605
     files = request.files.getlist('files')  # 获取多个文件
     print("Received idea:", new_idea)
     ideas = load_ideas()
@@ -82,11 +79,7 @@ def add_idea():
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
             filenames.append(filename)
 
-<<<<<<< HEAD
     ideas.insert(0, {'id': idea_id, 'idea': new_idea, 'timestamp': local_timestamp, 'images': filenames})
-=======
-    ideas.insert(0, {'id': idea_id, 'idea': new_idea, 'timestamp': datetime.now().strftime("%Y-%m-%d %H:%M:%S"), 'images': filenames})
->>>>>>> d80969a7a5799dd4627d1610c714e380ca921605
     save_ideas(ideas)
     return redirect(url_for('index'))
 
@@ -115,7 +108,6 @@ def delete_image(idea_id, filename):
     ideas = load_ideas()
     idea = next((item for item in ideas if item['id'] == idea_id), None)
     if idea and filename in idea['images']:
-<<<<<<< HEAD
         idea['images'].remove(filename)  # 从想法中删除引用
         file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
         if os.path.exists(file_path):
@@ -125,19 +117,6 @@ def delete_image(idea_id, filename):
     return 'Not Found', 404
 
 @app.route('/edit/<idea_id>', methods=['POST'])
-=======
-        try:
-            os.remove(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            idea['images'].remove(filename)
-            save_ideas(ideas)
-            return '', 204
-        except OSError as e:
-            print(f"Error deleting image {filename}: {e}")
-            return 'Error deleting image', 500
-    return 'Image not found', 404
-
-@app.route('/edit/<idea_id>', methods=['GET', 'POST'])
->>>>>>> d80969a7a5799dd4627d1610c714e380ca921605
 @requires_auth
 def edit_idea(idea_id):
     ideas = load_ideas()
