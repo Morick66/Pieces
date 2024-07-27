@@ -16,11 +16,7 @@
     z-index: 10;
     left: 50%;
     top: 50%;
-    height: auto;
-    width: 90%;
     transform: translate(-50%, -50%);
-    width: max-content;
-    height: max-content;
 }
 
 /* 媒体查询：当页面宽度小于600px时 */
@@ -51,6 +47,7 @@
     border: 1px solid var(--card-border-color);
     border-radius: 20px;
 }
+
 .modal-title {
     font-size: 20px;
     color: var(--text-main-color);
@@ -67,17 +64,7 @@
     top: 15px;
     border-radius: 50%;
 }
-.form-control {
-    resize: none;
-    box-sizing: border-box;
-    height: calc(auto+20px);
-    width: 100%;
-    padding: 10px;
-    background-color: transparent;
-    border: none;
-    outline: none;
-    color: var(--text-main-color);
-}
+
 .modal-body input {
     color: var(--text-main-color);
 }
@@ -89,7 +76,6 @@
 .modal-footer button {
     width: auto;
     padding: 5px 10px;
-    height: auto;
     background-color: #3a9bc5;
     border: none;
     border-radius: 5px;

@@ -16,6 +16,17 @@ PASSWORD = os.getenv('PASSWORD', 'pieces')
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
+def load_svg(icon_name):
+    path = os.path.join(app.static_folder, f"icons/{icon_name}.svg")
+    try:
+        with open(path, 'r') as file:
+            return file.read()
+    except FileNotFoundError:
+        raise Exception(f"Error: icon '{icon_name}.svg' is not found under 'static/icons' folder")
+
+# 注册为全局函数
+app.jinja_env.globals.update(load_svg=load_svg)
+
 # 确保上传文件夹存在
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
@@ -66,6 +77,7 @@ def index():
 @requires_auth
 def add_idea():
     new_idea = request.form.get('idea')
+    link = request.form.get('link')
     local_timestamp = request.form.get('local_timestamp')
     files = request.files.getlist('files')  # 获取多个文件
     print("Received idea:", new_idea)
@@ -79,7 +91,7 @@ def add_idea():
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
             filenames.append(filename)
 
-    ideas.insert(0, {'id': idea_id, 'idea': new_idea, 'timestamp': local_timestamp, 'images': filenames})
+    ideas.insert(0, {'id': idea_id, 'idea': new_idea, 'link': link, 'timestamp': local_timestamp, 'images': filenames})
     save_ideas(ideas)
     return redirect(url_for('index'))
 

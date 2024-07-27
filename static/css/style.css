@@ -3,16 +3,17 @@
 @import url('content.css');
 @import url('nav.css');
 @import url('editModal.css');
-
+@import url('lightbox.css');
 main {
     max-width: 800px;
     margin: 0 auto;
 }
 
-.modal-content .form-control {
-    resize: none;
-    height: 150px;
-}
 body {
     background-color: var(--body-background-color) !important;
+}
+.icon {
+    width: auto;
+    height: 20px;
+    fill: #ffffff;
 }

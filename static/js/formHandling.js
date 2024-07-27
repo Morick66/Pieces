@@ -63,6 +63,15 @@ function handleSubmit(event) {
     });
 }
 
+function toggleVisibility() {
+    var linkInput = document.querySelector('.linkInput');
+    if (linkInput.style.display === 'none') {
+        linkInput.style.display = 'block';
+    } else {
+        linkInput.style.display = 'none';
+    }
+}
+
 function autoResize(textarea) {
     // 清除旧的样式
     textarea.style.height = 'auto';

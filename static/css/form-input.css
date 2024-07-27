@@ -8,10 +8,10 @@
     border: 1px solid var(--card-border-color);
 }
 
-.form-input textarea {
+textarea {
+    font-size: 16px;
     resize: none;
     box-sizing: border-box;
-    height: auto;
     width: 100%;
     padding: 10px;
     background-color: transparent;
@@ -19,12 +19,8 @@
     outline: none;
     color: var(--text-main-color);
 }
-.icon {
-    width: auto;
-    height: 20px;
-    fill: #3a9bc5;
-}
-.form-input button {
+
+button[type="submit"] {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -32,8 +28,10 @@
     border-radius: 5px;
     padding: 5px 15px;
 }
-
-.form-input button:hover {
+button[type="submit"] svg {
+    fill: var(--card-background-color);
+}
+button[type="submit"]:hover {
     background-color: rgb(204, 204, 216);
 }
 
@@ -42,9 +40,17 @@
     justify-content: space-between;
 }
 .preview {
+    padding: 10px 0;
     display: flex;
     gap: 8px;
-    margin-bottom: 10px;
+    overflow-x: auto;
+    overflow-y: visible;
+    scrollbar-width: thin;
+    scrollbar-color: transparent;
+}
+/* 滚动条轨道样式 */
+.preview::-webkit-scrollbar-track {
+    background: transparent; /* 滚动条轨道颜色 */
 }
 .img-preview-container {
     position: relative;
@@ -61,4 +67,36 @@
     right: -5px;
     justify-content: center;
     align-items: center;
+}
+.upload {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    align-items: center;
+    padding: 0 10px;
+}
+.upload button {
+    background-color: transparent;
+    border: none;
+}
+
+.upload svg {
+    fill: var(--text-main-color);
+    stroke-width: 10;
+}
+.linkInput {
+    width: 100%;
+    display: none;
+    margin-top: 10px;
+    border-top: 1px solid var(--card-border-color);
+}
+.linkInput input {
+    color: var(--text-main-color);
+    background-color: transparent;
+    box-sizing: border-box;
+    width: 100%;
+    height: auto;
+    border: none;
+    outline: none;
+    padding: 5px;
 }
