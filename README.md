@@ -10,7 +10,9 @@
 
 ### 记录页面
 
-![alt text](images/image.png)![alt text](images/image3.png)
+
+<img src="https://github.com/Morick66/Pieces/blob/master/images/image.png" width="180" height="105"><img src="https://github.com/Morick66/Pieces/blob/master/images/image3.png" width="200" height=auto>
+
 
 ### 博客展示
 
