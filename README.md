@@ -14,7 +14,7 @@
 <img src="https://github.com/Morick66/Pieces/blob/master/images/image.png" width="50%" height="auto"><img src="https://github.com/Morick66/Pieces/blob/master/images/image3.png" width="50%" height=auto>
 
 
-### 博客展示
+### 前端展示——[我的博客页面](https://www.morick66.com/pieces/)
 
 ![alt text](images/image2.png)
 
@@ -43,7 +43,9 @@ docker run -d \
 
 ## 数据获取
 
-直接访问`你的域名/data.json`获取数据，使用js加载到博客的静态页面。
+直接访问`https://你的域名/data.json`获取数据，使用js加载到博客的静态页面。
+
+图片文件路径`https://你的域名/uploads/图片名`
 
 ## 使用到的项目
 
