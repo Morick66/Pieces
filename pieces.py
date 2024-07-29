@@ -11,7 +11,7 @@ IDEAS_FILE = '/data/data.json'
 UPLOAD_FOLDER = '/data/images'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp', 'svg'}
 
-USERNAME = os.getenv('USERNAME', 'admain')
+USERNAME = os.getenv('USERNAME', 'admin')
 PASSWORD = os.getenv('PASSWORD', 'pieces')
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
