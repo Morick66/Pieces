@@ -11,7 +11,7 @@
 ### 记录页面
 
 
-<img src="https://github.com/Morick66/Pieces/blob/master/images/image.png" width="180" height="105"><img src="https://github.com/Morick66/Pieces/blob/master/images/image3.png" width="200" height=auto>
+<img src="https://github.com/Morick66/Pieces/blob/master/images/image.png" width="200" height="auto"><img src="https://github.com/Morick66/Pieces/blob/master/images/image3.png" width="200" height=auto>
 
 
 ### 博客展示
